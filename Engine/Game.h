@@ -20,10 +20,11 @@
  ******************************************************************************************/
 #pragma once
 
-#include "Mat3.h"
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
+#include "Shape.h"
+#include "Mat3.h"
 
 class Game
 {
@@ -39,10 +40,15 @@ private:
 	/*  User Functions              */
 	/********************************/
 private:
-	Vec2 v = {0, 0};
 	MainWindow& wnd;
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
 	/********************************/
+	Vec2 v = { 0, 0 };
+	int cx = Graphics::ScreenWidth / 2;
+	int cy = Graphics::ScreenHeight / 2;
+	Vec3 eye = {cx, cy, -1};
+	std::vector<Shape*> shapes;
+	Sphere sphere;
 };

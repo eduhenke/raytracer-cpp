@@ -24,8 +24,10 @@
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
-	gfx( wnd )
+	gfx( wnd ),
+	sphere(Sphere(Vec3(10, 20, 2), 20))
 {
+	shapes.push_back(&sphere);
 }
 
 void Game::Go()
@@ -43,5 +45,6 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
+	sphere.intersects(eye, Vec3(0,0,1));
 	gfx.PutPixel(v, Colors::Cyan);
 }
