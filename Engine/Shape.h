@@ -8,14 +8,17 @@ public:
 	virtual Vec3 getCenter() = 0;
 	virtual Vec3 getNormal(const Vec3& pHit) = 0;
 	virtual double distance(const Vec3& src, const Vec3& dest) = 0;
-	virtual bool intersects(const Vec3& src, const Vec3& dest) = 0;
+	virtual bool intersects(const Vec3& o, const Vec3& d)
+	{
+		return (distance(o, d) == INFINITY) ? false : true;
+	}
 };
 
 class Sphere : public Shape
 {
 public:
-	float r = 0;
-	Vec3 center = { 0,0,0 };
+	float r;
+	Vec3 center;
 	Sphere(const Vec3& c, float r) : center(c), r(r) {};
 	Vec3 getCenter()
 	{
@@ -41,9 +44,26 @@ public:
 		return (t < 0.) ? INFINITY : t;
 
 	}
-	bool intersects(const Vec3& o, const Vec3& d)
-	{
-		return (distance(o, d) == INFINITY) ? false : true;
-	}
 };
 
+class Plane : public Shape
+{
+public:
+	Vec3 normal;
+	float dist;
+	Plane(const Vec3& normal, const Vec3& pos): normal(normal), dist(pos.Len())	{};
+	Plane(const Vec3& normal, float dist): normal(normal), dist(dist) {};
+	Vec3 getCenter()
+	{
+		return normal*dist;
+	};
+	Vec3 getNormal(const Vec3& pHit)
+	{
+		return normal;
+	}
+	double distance(const Vec3& o, const Vec3& d)
+	{
+		double t = dist - (o*normal) / (d*normal);
+		return (t > 0) ? t : INFINITY;
+	};
+};

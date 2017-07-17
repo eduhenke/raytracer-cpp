@@ -47,8 +47,10 @@ private:
 	/*  User Variables              */
 	/********************************/
 	float theta = 0;
-	Vec3 eye = {0, 0.2, -1.};
+	Vec3 eye = { 0, 0.2, -1. };
 	Vec3 light = { 1.,2.,0.2 };
 	std::vector<Shape*> shapes;
-	Sphere sphere, plane;
+	Sphere sphere =  Sphere(Vec3(0.5, 0.4, 1.4), 0.4);
+	Sphere sphere2 = Sphere(Vec3(0., 0.7, 2.), 0.7);
+	Plane plane =	 Plane(Vec3(0., 1, 0), 0);
 };

@@ -24,12 +24,12 @@
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
-	gfx( wnd ),
-	sphere(Sphere(Vec3(0.5, 0.4, 1.4), 0.4)),
-	plane(Sphere(Vec3(0.,-1e5, 0), 1e5))
+	gfx( wnd )
 {
 	plane.color = Colors::Cyan;
+	sphere2.color = Colors::Red;
 	shapes.push_back(&plane);
+	shapes.push_back(&sphere2);
 	shapes.push_back(&sphere);
 }
 
