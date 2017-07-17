@@ -48,7 +48,7 @@ private:
 	Vec2 v = { 0, 0 };
 	int cx = Graphics::ScreenWidth / 2;
 	int cy = Graphics::ScreenHeight / 2;
-	Vec3 eye = {cx, cy, -1};
+	Vec3 eye = {cx, cy, -500};
 	std::vector<Shape*> shapes;
 	Sphere sphere;
 };

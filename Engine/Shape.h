@@ -18,8 +18,13 @@ public:
 	{
 		return center;
 	}
-	bool intersects(const Vec3& src, const Vec3& dest)
+	bool intersects(const Vec3& o, const Vec3& d)
 	{
+		Vec3 dist = o - center;
+		float b = 2 * (d*dist);
+		float c = sq(dist) - sq(r);
+		float det = sq(b) - 4 * c;			// a = d^2, d being unit vector => a = 1
+		if (det < 0) return false;
 		return true;
 	}
 };

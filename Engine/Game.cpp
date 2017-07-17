@@ -25,7 +25,7 @@ Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd ),
-	sphere(Sphere(Vec3(10, 20, 2), 20))
+	sphere(Sphere(Vec3(100, 200, 2), 50))
 {
 	shapes.push_back(&sphere);
 }
@@ -45,6 +45,17 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
-	sphere.intersects(eye, Vec3(0,0,1));
-	gfx.PutPixel(v, Colors::Cyan);
+	for (int x = 0; x < Graphics::ScreenWidth; x++)
+	{
+		for (int y = 0; y < Graphics::ScreenHeight; y++)
+		{
+			Vec3 to = Vec3(x, y, 0) - eye;
+			to.Normalize();
+			if (sphere.intersects(eye, to))
+			{
+				gfx.PutPixel(x, y, Colors::White);
+			}
+		}
+
+	}
 }
