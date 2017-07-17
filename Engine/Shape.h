@@ -6,7 +6,8 @@ class Shape
 public:
 	Color color = Colors::White;
 	virtual Vec3 getCenter() = 0;
-	virtual float distance(const Vec3& src, const Vec3& dest) = 0;
+	virtual Vec3 getNormal(const Vec3& pHit) = 0;
+	virtual double distance(const Vec3& src, const Vec3& dest) = 0;
 	virtual bool intersects(const Vec3& src, const Vec3& dest) = 0;
 };
 
@@ -20,19 +21,24 @@ public:
 	{
 		return center;
 	}
-	float distance(const Vec3& o, const Vec3& d)
+	Vec3 getNormal(const Vec3& pHit)
+	{
+		
+		return (pHit - center) / r;	// can be optimized to / r;
+	}
+	double distance(const Vec3& o, const Vec3& d)
 	{
 		Vec3 dist = o - center;
-		float b = 2 * (d*dist);
-		float c = sq(dist) - sq(r);
-		float det = sq(b) - 4 * c;			// a = d^2, d being unit vector => a = 1
-		if (det < 0) return INFINITY;
-		float sqr = sqrt(det);
-		float t1 = -b - sqr;
-		float t2 = -b + sqr;
-		if (t1 < 0) return INFINITY;
-		float t = min(t1, t2);
-		return (t < 0) ? INFINITY : t;
+		double b = 2 * (d*dist);
+		double c = sq(dist) - sq(r);
+		double det = sq(b) - 4 * c;			// a = d^2, d being unit vector => a = 1
+		if (det < 0.) return INFINITY;
+		det = sqrt(det);
+		double t = (-b - det)/2;
+		if (t < 0.) return INFINITY;
+		double t2 = (-b + det) / 2;
+		t = min(t, t2);
+		return (t < 0.) ? INFINITY : t;
 
 	}
 	bool intersects(const Vec3& o, const Vec3& d)

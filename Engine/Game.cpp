@@ -25,10 +25,10 @@ Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd ),
-	sphere(Sphere(Vec3(0.1, 0, 3.), 1.)),
-	plane(Sphere(Vec3(0.,-1e10, 0), 1e10))
+	sphere(Sphere(Vec3(0.5, 0.4, 1.4), 0.4)),
+	plane(Sphere(Vec3(0.,-1e5, 0), 1e5))
 {
-	plane.color = Colors::LightGray;
+	plane.color = Colors::Cyan;
 	shapes.push_back(&plane);
 	shapes.push_back(&sphere);
 }
@@ -46,6 +46,8 @@ void Game::UpdateModel()
 	//theta -= 1e-3;
 	//eye.y -= 1e-1;
 	//sphere.center.z -= 1e-1;
+	//light.x-=0.4;
+	light.x += 0.2;
 }
 
 void Game::ComposeFrame()
@@ -62,14 +64,26 @@ void Game::ComposeFrame()
 			Vec3 to = Vec3(xn, yn, 0) - eye;
 			to = to*rotationMatrix;
 			to.Normalize();
-			for (Shape* shp : shapes)
+			int x = (xn + 1)*WIDTH / 2;
+			int y = HEIGHT*(1 - (yn + 1) / 2) - 1;
+			for (int k = 0; k < shapes.size(); k++)
 			{
+				Shape* shp = shapes[k];
 				float distance = shp->distance(eye, to);
 				if (distance != INFINITY)
 				{	
-					int x = (xn + 1)*WIDTH / 2;
-					int y = HEIGHT*(1 - (yn + 1) / 2) - 1;
-					float lightFactor = 1/ (distance+1);
+					Vec3 pointHit = to*distance + eye;
+					Vec3 toLight = light - pointHit;
+					toLight.Normalize();
+					Vec3 normal = shp->getNormal(pointHit);
+					float lightFactor = normal*toLight;
+					if (lightFactor < 0.05) lightFactor = 0.05; // Ambient
+					for (int j = 0; j < shapes.size(); j++)
+					{
+						if (j == k) continue;
+						Shape* otherShp = shapes[j];
+						if (otherShp->intersects(pointHit, toLight)) lightFactor = 0;
+					}
 					Color color = shp->color;
 					color.SetR(color.GetR()*lightFactor);
 					color.SetG(color.GetG()*lightFactor);

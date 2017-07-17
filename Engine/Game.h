@@ -46,9 +46,9 @@ private:
 	/********************************/
 	/*  User Variables              */
 	/********************************/
-	Vec2 v = { 0., 0. };
 	float theta = 0;
 	Vec3 eye = {0, 0.2, -1.};
+	Vec3 light = { 1.,2.,0.2 };
 	std::vector<Shape*> shapes;
 	Sphere sphere, plane;
 };
