@@ -25,7 +25,8 @@
 #include "Graphics.h"
 #include "Shape.h"
 #include "Mat3.h"
-
+#define HEIGHT Graphics::ScreenHeight
+#define WIDTH Graphics::ScreenWidth
 class Game
 {
 public:
@@ -45,10 +46,9 @@ private:
 	/********************************/
 	/*  User Variables              */
 	/********************************/
-	Vec2 v = { 0, 0 };
-	int cx = Graphics::ScreenWidth / 2;
-	int cy = Graphics::ScreenHeight / 2;
-	Vec3 eye = {cx, cy, -500};
+	Vec2 v = { 0., 0. };
+	float theta = 0;
+	Vec3 eye = {0, 0.2, -1.};
 	std::vector<Shape*> shapes;
-	Sphere sphere;
+	Sphere sphere, plane;
 };

@@ -25,8 +25,11 @@ Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd ),
-	sphere(Sphere(Vec3(100, 200, 2), 50))
+	sphere(Sphere(Vec3(0.1, 0, 3.), 1.)),
+	plane(Sphere(Vec3(0.,-1e10, 0), 1e10))
 {
+	plane.color = Colors::LightGray;
+	shapes.push_back(&plane);
 	shapes.push_back(&sphere);
 }
 
@@ -40,20 +43,39 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	v += Vec2{ 1,2 };
+	//theta -= 1e-3;
+	//eye.y -= 1e-1;
+	//sphere.center.z -= 1e-1;
 }
 
 void Game::ComposeFrame()
 {
-	for (int x = 0; x < Graphics::ScreenWidth; x++)
+	Mat3 rotationMatrix = Mat3::RotationY(theta);
+	static double dx = 2. / WIDTH;
+	static double dy = 2. / HEIGHT;
+	for (float xn = -1; xn < 1 ; xn+=dx)
 	{
-		for (int y = 0; y < Graphics::ScreenHeight; y++)
+		for (float yn = -1; yn < 1; yn+=dy)
 		{
-			Vec3 to = Vec3(x, y, 0) - eye;
+			/*float xn = (2 * x / (float)WIDTH ) - 1;
+			float yn = 1 - (2 / (float)HEIGHT)*(y + 1);*/
+			Vec3 to = Vec3(xn, yn, 0) - eye;
+			to = to*rotationMatrix;
 			to.Normalize();
-			if (sphere.intersects(eye, to))
+			for (Shape* shp : shapes)
 			{
-				gfx.PutPixel(x, y, Colors::White);
+				float distance = shp->distance(eye, to);
+				if (distance != INFINITY)
+				{	
+					int x = (xn + 1)*WIDTH / 2;
+					int y = HEIGHT*(1 - (yn + 1) / 2) - 1;
+					float lightFactor = 1/ (distance+1);
+					Color color = shp->color;
+					color.SetR(color.GetR()*lightFactor);
+					color.SetG(color.GetG()*lightFactor);
+					color.SetB(color.GetB()*lightFactor);
+					gfx.PutPixel(x, y, color);
+				}
 			}
 		}
 

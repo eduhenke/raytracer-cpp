@@ -21,6 +21,7 @@
 #pragma once
 
 #include <math.h>
+#define INFINITY FLT_MAX
 
 constexpr float PI = 3.14159265f;
 constexpr double PI_D = 3.1415926535897932;
@@ -38,4 +39,16 @@ inline T wrap_angle( T theta )
 	return (modded > (T)PI_D) ?
 		(modded - (T)2.0 * (T)PI_D) :
 		modded;
+}
+
+template <typename T>
+inline auto max(const T& x, const T& y)
+{
+	return (x > y) ? x : y;
+}
+
+template <typename T>
+inline auto min(const T& x, const T& y)
+{
+	return (y < x) ? y : x;
 }
