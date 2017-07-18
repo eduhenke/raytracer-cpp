@@ -23,7 +23,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
-#include "Shape.h"
+#include "Ray.h"
 #include "Mat3.h"
 #define HEIGHT Graphics::ScreenHeight
 #define WIDTH Graphics::ScreenWidth
@@ -46,15 +46,13 @@ private:
 	/********************************/
 	/*  User Variables              */
 	/********************************/
-	float thetaY = 0, thetaX = 0;
-	Shape* shapeHitScreen[WIDTH][HEIGHT];
-	Vec3 eye = { 0, 0.2, -1. };
+	float thetaY = -5e-1, thetaX = 0;
+	Vec3 eye = { 0, 0.1, -1. };
 	Vec3 light = { 0.5,2.,0.2 };
-	Vec3 translationVec = { 0,0,0 };
-	std::vector<Shape*> shapes;
+	Scene scene;
 	int shapesSize;
-	Sphere sphere =  Sphere(Vec3(0.5, 0.4, 1.4), 0.4);
-	Sphere sphere2 = Sphere(Vec3(0., 0.7, 2.), 0.7);
+	Sphere sphere =  Sphere(Vec3(0, 0.8, 3.8), 0.8);
+	Sphere sphere2 = Sphere(Vec3(0., 20., 25.), 20.);
+	Sphere sphere3 = Sphere(Vec3(-5., 4., 10.), 4.);
 	Plane floor =	 Plane(Vec3(0., 1, 0), 0);
-	Sky sky = Sky(Colors::Black);
 };

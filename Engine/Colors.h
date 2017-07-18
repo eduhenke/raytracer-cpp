@@ -91,7 +91,7 @@ public:
 	{
 		dword = (dword & 0xFFFFFF00u) | b;
 	}
-	void SetLight(float factor)
+	Color& SetLight(float factor)
 	{
 		int r = GetR()*factor;
 		int g = GetG()*factor;
@@ -99,6 +99,25 @@ public:
 		SetR(r > 255 ? 255 : r);
 		SetG(g > 255 ? 255 : g);
 		SetB(b > 255 ? 255 : b);
+		return *this;
+	}
+	Color&	operator+=(const Color& rhs)
+	{
+		int r = GetR() + rhs.GetR();
+		int g = GetG() + rhs.GetG();
+		int b = GetB() + rhs.GetB();
+		SetR(r > 255 ? 255 : r);
+		SetG(g > 255 ? 255 : g);
+		SetB(b > 255 ? 255 : b);
+		return *this;
+	}
+	Color operator+(const Color& rhs)
+	{
+		return Color(*this) += rhs;
+	}
+	Color operator*(float factor)
+	{
+		return Color(*this).SetLight(factor);
 	}
 };
 
