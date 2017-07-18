@@ -91,6 +91,15 @@ public:
 	{
 		dword = (dword & 0xFFFFFF00u) | b;
 	}
+	void SetLight(float factor)
+	{
+		int r = GetR()*factor;
+		int g = GetG()*factor;
+		int b = GetB()*factor;
+		SetR(r > 255 ? 255 : r);
+		SetG(g > 255 ? 255 : g);
+		SetB(b > 255 ? 255 : b);
+	}
 };
 
 namespace Colors

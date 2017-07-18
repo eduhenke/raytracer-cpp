@@ -46,11 +46,15 @@ private:
 	/********************************/
 	/*  User Variables              */
 	/********************************/
-	float theta = 0;
+	float thetaY = 0, thetaX = 0;
+	Shape* shapeHitScreen[WIDTH][HEIGHT];
 	Vec3 eye = { 0, 0.2, -1. };
-	Vec3 light = { 1.,2.,0.2 };
+	Vec3 light = { 0.5,2.,0.2 };
+	Vec3 translationVec = { 0,0,0 };
 	std::vector<Shape*> shapes;
+	int shapesSize;
 	Sphere sphere =  Sphere(Vec3(0.5, 0.4, 1.4), 0.4);
 	Sphere sphere2 = Sphere(Vec3(0., 0.7, 2.), 0.7);
-	Plane plane =	 Plane(Vec3(0., 1, 0), 0);
+	Plane floor =	 Plane(Vec3(0., 1, 0), 0);
+	Sky sky = Sky(Colors::Black);
 };

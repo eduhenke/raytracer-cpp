@@ -26,11 +26,17 @@ Game::Game( MainWindow& wnd )
 	wnd( wnd ),
 	gfx( wnd )
 {
-	plane.color = Colors::Cyan;
+	floor.color = Colors::Green;
 	sphere2.color = Colors::Red;
-	shapes.push_back(&plane);
+	shapes.push_back(&floor);
 	shapes.push_back(&sphere2);
 	shapes.push_back(&sphere);
+	shapesSize = shapes.size();
+}
+
+inline Vec3 RotateYThroughAxis(const Vec3& vec, const Vec3& axis, float theta)
+{
+	return axis + (vec - axis)*Mat3::RotationY(theta);
 }
 
 void Game::Go()
@@ -47,49 +53,88 @@ void Game::UpdateModel()
 	//eye.y -= 1e-1;
 	//sphere.center.z -= 1e-1;
 	//light.x-=0.4;
-	light.x += 0.2;
+	while (!wnd.kbd.KeyIsEmpty())
+	{
+		const auto e = wnd.kbd.ReadKey();
+		static float step = 0.5;
+		static float thetaStep = 0.1;
+		if (wnd.kbd.KeyIsPressed('W'))
+		{
+			//thetaY += thetaStep;
+			light.z++;
+		}
+		else if (wnd.kbd.KeyIsPressed('S'))
+		{
+			//thetaY -= thetaStep;
+			light.z--;
+		}
+		else if (wnd.kbd.KeyIsPressed('A'))
+		{
+			//thetaX -= thetaStep;
+			light.x--;
+		}
+		else if (wnd.kbd.KeyIsPressed('D'))
+		{
+			//thetaX += thetaStep;
+			light.x++;
+		}
+		else if (wnd.kbd.KeyIsPressed('Q'))
+		{
+			light.y++;
+		}
+		else if (wnd.kbd.KeyIsPressed('E'))
+		{
+			light.y--;
+		}
+		else if (e.GetCode() == VK_ESCAPE && e.IsPress())
+		{
+			wnd.Kill();
+		}
+	}
 }
 
 void Game::ComposeFrame()
 {
-	Mat3 rotationMatrix = Mat3::RotationY(theta);
-	static double dx = 2. / WIDTH;
-	static double dy = 2. / HEIGHT;
-	for (float xn = -1; xn < 1 ; xn+=dx)
+	Mat3 rotationMatrix = Mat3::RotationY(thetaX)*Mat3::RotationX(thetaY);
+	static float dx = 2. / WIDTH;
+	static float dy = 2. / HEIGHT;
+	for (float xn = -1.; xn < 1.; xn += dx)
 	{
-		for (float yn = -1; yn < 1; yn+=dy)
+		for (float yn = -1.; yn < 1.; yn += dy)
 		{
 			/*float xn = (2 * x / (float)WIDTH ) - 1;
 			float yn = 1 - (2 / (float)HEIGHT)*(y + 1);*/
-			Vec3 to = Vec3(xn, yn, 0) - eye;
-			to = to*rotationMatrix;
+			Vec3 to = (Vec3(xn, yn, 0) - eye)*rotationMatrix;
 			to.Normalize();
 			int x = (xn + 1)*WIDTH / 2;
 			int y = HEIGHT*(1 - (yn + 1) / 2) - 1;
-			for (int k = 0; k < shapes.size(); k++)
+			float minDist = INFINITY;
+			for (Shape* shp : shapes)
 			{
-				Shape* shp = shapes[k];
-				float distance = shp->distance(eye, to);
-				if (distance != INFINITY)
-				{	
-					Vec3 pointHit = to*distance + eye;
-					Vec3 toLight = light - pointHit;
-					toLight.Normalize();
-					Vec3 normal = shp->getNormal(pointHit);
-					float lightFactor = normal*toLight;
-					if (lightFactor < 0.05) lightFactor = 0.05; // Ambient
-					for (int j = 0; j < shapes.size(); j++)
-					{
-						if (j == k) continue;
-						Shape* otherShp = shapes[j];
-						if (otherShp->intersects(pointHit, toLight)) lightFactor = 0;
-					}
-					Color color = shp->color;
-					color.SetR(color.GetR()*lightFactor);
-					color.SetG(color.GetG()*lightFactor);
-					color.SetB(color.GetB()*lightFactor);
-					gfx.PutPixel(x, y, color);
+				float dist = shp->distance(eye, to);
+				if (minDist >= dist)
+				{
+					minDist = dist;
+					shapeHitScreen[x][y] = shp;
 				}
+			}
+		}
+	}
+	for (float xn = -1.; xn < 1. ; xn+=dx)
+	{
+		for (float yn = -1.; yn < 1.; yn+=dy)
+		{
+			Vec3 to = (Vec3(xn, yn, 0) - eye)*rotationMatrix;
+			to.Normalize();
+			int x = (xn + 1)*WIDTH / 2;
+			int y = HEIGHT*(1 - (yn + 1) / 2) - 1;
+			Shape* shapeHit = shapeHitScreen[x][y];
+			float distance = shapeHit->distance(eye, to);
+			if (distance != INFINITY)
+			{
+				Vec3 pointHit = to*distance + eye;
+				Color color = shapeHit->getColor(pointHit, eye, light, shapes);
+				gfx.PutPixel(x, y, color);
 			}
 		}
 
