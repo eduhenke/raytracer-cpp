@@ -25,6 +25,8 @@
 #include "Graphics.h"
 #include "Ray.h"
 #include "Mat3.h"
+#include <cstdlib>
+#include <ctime>
 #define HEIGHT Graphics::ScreenHeight
 #define WIDTH Graphics::ScreenWidth
 class Game
@@ -47,12 +49,13 @@ private:
 	/*  User Variables              */
 	/********************************/
 	float thetaY = -5e-1, thetaX = 0;
-	Vec3 eye = { 0, 0.1, -1. };
-	Vec3 light = { 0.5,2.,0.2 };
+	Vec3 eye = { 0, 1.7, -1.5 };
+	Vec3 light = { 0.5,5.,3.2 };
+	Vec3 light2 = { 10,50.,100 };
+	Vec3 light3 = { 0.2,8.,-10.0 };
 	Scene scene;
-	int shapesSize;
-	Sphere sphere =  Sphere(Vec3(0, 0.8, 3.8), 0.8);
-	Sphere sphere2 = Sphere(Vec3(0., 20., 25.), 20.);
-	Sphere sphere3 = Sphere(Vec3(-5., 4., 10.), 4.);
-	Plane floor =	 Plane(Vec3(0., 1, 0), 0);
+	Sphere sphere =  Sphere(Vec3(0.2, 0.8, 5.8), 1, Colors::HotPink, 0.8, 0., 4);
+	Sphere sphere2 = Sphere(Vec3(4., 0., 45.), 30., Colors::Blue, 0, 0.1, 1);
+	Sphere sphere3 = Sphere(Vec3(-5., 4., 10.), 4., Colors::Green, 0, 0.3, 1);
+	Plane floor =	 Plane(Vec3(0., 1, 0), 0, Colors::Red);
 };

@@ -1,46 +1,18 @@
 #include "Shape.h"
 #include "Ray.h"
 
-Color Shape::getColor(Ray& viewerRay, const Vec3& pHit, const Scene& scene)
-{
-	Vec3 L = (*(scene.lights[0]) - pHit); // toLight
-	Vec3 L_hat = L.GetNormalized();
-	Vec3 N = this->getNormal(pHit); //normal
-	Vec3 V = -viewerRay.dst; // toViewer
-	Vec3 H = (L_hat + V).GetNormalized(); // halfwayReflected
-	float ln = L_hat*N;
-	float nh = N*H;
-	nh = pow(nh, alpha);
-	float lightFactor = AMBIENT_LIGHT + ln*kd + nh*ks;
-	float minDist = INFINITY; // min. distance of toLight for every Shape
-	for (Shape* shp : scene.shapes)
-	{
-		if (shp == this)continue;
-		float dist = shp->distance(Ray(pHit, L_hat));
-		if (dist < minDist)
-		{
-			minDist = dist;
-		}
-	}
-	if (minDist < L.Len()) lightFactor = 0;	// if minDist less than toLight, light is obstructed
-	if (lightFactor < AMBIENT_LIGHT)lightFactor = AMBIENT_LIGHT;
-	return this->color*lightFactor;
-
-}
-
 double Sphere::distance(const Ray & ray)
 {
 	Vec3 dist = ray.src - center;
 	double b = 2 * (ray.dst*dist);
-	double c = sq(dist) - sq(r);
-	double det = sq(b) - 4 * c;			// a = d^2, d being unit vector => a = 1
-	if (det < 0.) return INFINITY;
-	det = sqrt(det);
-	double t = (-b - det) / 2;
-	if (t < 0.) return INFINITY;
-	double t2 = (-b + det) / 2;
-	t = min(t, t2);
-	return (t < 0.) ? INFINITY : t;
+	double c = sq(dist) - rSq;
+	double disc = sq(b) - 4 * c;			// a = d^2, d being unit vector => a = 1
+	if (disc < 0.) return INFINITY;
+	disc = sqrt(disc);
+	double t = (-b - disc) / 2;
+	if (t >= 0) return t;
+	t += disc;
+	return t < 0 ? INFINITY : t;
 }
 
 double Plane::distance(const Ray & ray)
@@ -48,3 +20,29 @@ double Plane::distance(const Ray & ray)
 	double t = dist - (ray.src*normal) / (ray.dst*normal);
 	return (t > 0) ? t : INFINITY;
 };
+
+Color Shape::getDiffuseColor(const Vec3 & pHit, const Scene & scene)
+{
+	float finalLightFactor = 0;
+	Vec3 N = this->getNormal(pHit); //normal
+	float lightsSize = scene.lights.size();
+	for (Vec3* lgt : scene.lights)
+	{
+		Vec3 L = lgt->GetNormalized();
+		//Vec3 V = -viewerRay.dst; // toViewer
+		//Vec3 H = (L + V).GetNormalized(); // halfwayReflected
+		//float nh = N*H;
+		//nh = pow(nh, alpha);
+		float lightFactor = AMBIENT_LIGHT + L*N*diffuse;// +nh*reflective;
+		double minDist = INFINITY; // min. distance of toLight for every Shape
+		for (Shape* shp : scene.shapes)
+		{
+			if (shp == this)continue;
+			minDist = min(minDist, shp->distance(Ray(pHit, L)));
+		}
+		if (minDist < lgt->Len()) lightFactor = 0;//finalColor += SHADOW_COLOR;	// if minDist less than toLight, light is obstructed
+		else if (lightFactor < AMBIENT_LIGHT) lightFactor = AMBIENT_LIGHT;
+		finalLightFactor += (lightFactor / lightsSize); // divided by how many lights
+	}
+	return color*finalLightFactor;
+}

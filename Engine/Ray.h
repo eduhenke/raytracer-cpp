@@ -5,46 +5,21 @@
 #include "Scene.h"
 
 #include "Shape.h"
-#define BOUNCE_DEPTH 2
+#include <assert.h>
+#define MAX_RAY_DEPTH 6
+#define UNIT_VECTOR_EPSILON 1e-5
+#define SHADOW_COLOR Colors::Black
+#define SKY_COLOR Colors::SkyBlue
 
 class Ray
 {
 public:
 	Vec3 src,dst;
-	uint8_t bounces = 0;
-	Ray(const Vec3& src, const Vec3& dst) :src(src), dst(dst), bounces() {};
-	~Ray() {};
-	Color raytrace(const Scene& scene, Shape* shapeHit)
+	Ray(const Vec3& src, const Vec3& dst) :src(src), dst(dst)
 	{
-		Color finalColor = Colors::Black;
-		float minDist = INFINITY;
-		for (Shape* shp : scene.shapes)
-		{
-			if (shp == shapeHit) continue;
-			float dist = shp->distance(*this);
-			if (dist < minDist)
-			{
-				minDist = dist;
-				shapeHit = shp;
-			}
-		}
-		if (minDist != INFINITY)
-		{
-			Vec3 pHit = dst*minDist + src;
-			finalColor = shapeHit->getColor(*this, pHit, scene);
-			if (bounces++ < BOUNCE_DEPTH)
-			{
-				Vec3 N = shapeHit->getNormal(pHit);
-				Vec3 V = -dst*minDist; // toViewer
-				Vec3 Rv = (N*(V*N) * 2 - V).GetNormalized(); // toViewerReflected
-				src = pHit;
-				dst = Rv;
-				Color color = this->raytrace(scene, shapeHit);
-				color.SetLight(shapeHit->ks);
-				finalColor += color;
-			}
-		}
-		return finalColor;
+		assert(dst*dst - 1. < UNIT_VECTOR_EPSILON);
 	};
+	~Ray() {};
+	Color raytrace(const Scene& scene, Shape* shapeHit, Shape* prevShape, uint8_t bounces);
 };
 
